@@ -1,6 +1,7 @@
 import React from 'react';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Modal, StyleSheet, TouchableOpacity } from 'react-native';
+import { Alert, Modal, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { Lang } from 'local/en';
 import summary from 'api/summary';
@@ -12,8 +13,15 @@ import View from 'components/basic/view';
 import ListCountries from 'components/ui/list-countries';
 import { DataCountries } from 'components/ui/country-card';
 
-const AddCase: React.FC = () => {
+type RootParamList = {
+  goback: undefined;
+};
+interface AddCaseProps {
+  navigation: StackNavigationProp<RootParamList>;
+}
+const AddCase: React.FC<AddCaseProps> = ({ navigation }) => {
   const { right, left } = useSafeAreaInsets();
+
   const data: resultDataProps | undefined = queryClient.getQueryData(summary.get.queryKey);
   const [selectedCountry, setSelectedCountry] = React.useState<number | undefined>();
   const [showSelectCountry, setShowSelectCountry] = React.useState(false);
@@ -25,7 +33,12 @@ const AddCase: React.FC = () => {
   };
 
   const handleAddCase = () => {
-    queryClient.setQueryData(summary.get.queryKey, oldData => update(oldData as resultDataProps));
+    if (selectedCountry === undefined) {
+      Alert.alert('please select country');
+    } else {
+      queryClient.setQueryData(summary.get.queryKey, oldData => update(oldData as resultDataProps));
+      navigation.goBack();
+    }
   };
   const update = (oldData: resultDataProps) => {
     const extractedOldData = { ...oldData };
@@ -57,7 +70,11 @@ const AddCase: React.FC = () => {
         <Text style={{ fontWeight: 'bold' }} size={20} onPress={() => setShowSelectCountry(true)}>
           Pick case type
         </Text>
-        <View isRow>
+        <View
+          style={{
+            flexWrap: 'wrap',
+          }}
+          isRow>
           <TouchableOpacity
             style={styles.caseButton}
             onPress={() => setSelectedCase('TotalConfirmed')}>

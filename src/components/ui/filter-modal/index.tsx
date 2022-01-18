@@ -14,7 +14,6 @@ const filter = [
 const Filters = ({ setFilter }: any) => {
   const onPress = (item: any) => {
     setFilter(item);
-    //  Navigation.dismissModal(props.componentId);
   };
 
   const _card = ({ item, index }: any) => (
